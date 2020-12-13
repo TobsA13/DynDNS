@@ -1,0 +1,5 @@
+{
+    "require": {
+        "mehr-it/hetzner-dns-api": "^0.8.0"
+    }
+}

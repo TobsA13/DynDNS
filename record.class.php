@@ -1,6 +1,8 @@
 <?php
 
-const TTL = 60;
+require __DIR__ . '/vendor/autoload.php';
+
+const TTL = 60; //FIXME
 
 class Record {
     var $zone;
@@ -9,18 +11,18 @@ class Record {
     var $zoneId;
     var $recordId;
 
-    function __construct($apiKey, $zone, $name){
+    function __construct($apiKey, $zoneId, $name){
         $this->zone = $zone;
-        $this->name = $name
+        $this->name = $name;
+        $this->zoneId = $zoneId;
 
         $this->client = new HetznerDnsClient($apiKey);
-        $this->zoneId = $this->client->getZoneByName($this->zone)->getZones()[0]->getId();
 
         $records = $this->client->getAllRecords($this->zoneId);
 
         $this->recordId = false;
         foreach ($records as $record){
-            if($record->getId() == $this->name){
+            if($record->getName() == $this->name){
                 $this->recordId = $record->getId();
                 break;
             }
@@ -33,7 +35,7 @@ class Record {
 
     function create(){
         if($this->exist()){
-            throw new RuntimeException("Record does already exist.")
+            throw new RuntimeException("Record does already exist.");
         }
         $response = $client->createRecord(
             (new Record())
@@ -46,9 +48,9 @@ class Record {
         $this->recordId = $response->getRecord()->getId();
     }
 
-    function deleteRecord(){
-        if(!$this->exist()){
-            throw new RuntimeException("Record does not exist.")
+    function delete(){
+        if(!$this->exist()){;
+            throw new RuntimeException("Record does not exist.");
         }
         $this->client->deleteRecord($this->recordId);
         $this->recordId = false;
@@ -56,7 +58,7 @@ class Record {
 
     function getIp(){
         if(!$this->exist()){
-            throw new RuntimeException("Record does not exist.")
+            throw new RuntimeException("Record does not exist.");
         }
         
         return $this->client->getRecord($this->recordId)->getValue();
@@ -64,11 +66,11 @@ class Record {
 
     function setIp($ip){
         if(!$this->exist()){
-            throw new RuntimeException("Record does not exist.")
+            throw new RuntimeException("Record does not exist.");
         }
         
         $record =  $this->client->getRecord($this->recordId);
-        $record->setValue($ip)
+        $record->setValue($ip);
         $this->client->updateRecord($this->recordId, $record);
     }
 }

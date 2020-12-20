@@ -1,9 +1,8 @@
 <?php
 
-$API_KEY = "ABC";
-$TTL = 60;
+const ADMIN_KEY = "";
+const HMAC_KEY= "";
+const API_KEY = "";
 
-$CONFIG = [
-    0 => ["name" => "dyndns", "record" => "ABC", "token" => "ABC"],
-    1 => ["name" => "home", "record" => "ABC", "token" => "ABC"]
-];
+const ZONE_ID = "";
+const TTL = 60;

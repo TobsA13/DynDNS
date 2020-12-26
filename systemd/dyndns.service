@@ -1,0 +1,12 @@
+[Unit]
+Description=DynDNS service
+
+[Service]
+Type=oneshot
+
+Nice=19
+IOSchedulingClass=2
+IOSchedulingPriority=7
+
+EnvironmentFile=/opt/dyndns/dyndns.env
+ExecStart=/opt/dyndns/dyndns

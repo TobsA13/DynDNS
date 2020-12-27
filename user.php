@@ -19,7 +19,7 @@ function checkAuth($host, $auth){
 function do_getIp($host){
     $record = new Record(API_KEY, ZONE_ID, $host);
     if(!$record->exist()){
-        result(400, "nohost");
+        result(404, "nohost");
     }
     echo $record->getIp();
 }
@@ -27,7 +27,7 @@ function do_getIp($host){
 function do_setIp($host, $ip){
     $record = new Record(API_KEY, ZONE_ID, $host);
     if(!$record->exist()){
-        result(400, "nohost");
+        result(404, "nohost");
     }
     if(!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)){
         result(400, "badsys not an IPv4", $ip);
@@ -37,7 +37,7 @@ function do_setIp($host, $ip){
         result(200, "nochg", $ip);
     }
     $record->setIp($ip);
-    result(200, "good", $ip);
+    result(201, "good", $ip);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {

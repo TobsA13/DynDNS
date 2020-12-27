@@ -2,7 +2,9 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-const TTL = 60; //FIXME
+defined('TTL') or define('TTL', 60);
+
+use MehrIt\HetznerDnsApi\HetznerDnsClient;
 
 class Record {
     var $zone;
@@ -12,7 +14,6 @@ class Record {
     var $recordId;
 
     function __construct($apiKey, $zoneId, $name){
-        $this->zone = $zone;
         $this->name = $name;
         $this->zoneId = $zoneId;
 
@@ -21,7 +22,7 @@ class Record {
         $records = $this->client->getAllRecords($this->zoneId);
 
         $this->recordId = false;
-        foreach ($records as $record){
+        foreach ($records->getRecords() as $record){
             if($record->getName() == $this->name){
                 $this->recordId = $record->getId();
                 break;
@@ -37,13 +38,13 @@ class Record {
         if($this->exist()){
             throw new RuntimeException("Record does already exist.");
         }
-        $response = $client->createRecord(
-            (new Record())
+        $response = $this->client->createRecord(
+            (new MehrIt\HetznerDnsApi\Models\Record())
                 ->zoneId($this->zoneId)
                 ->ttl(TTL)
-                ->type(Record::TYPE_A)
+                ->type(MehrIt\HetznerDnsApi\Models\Record::TYPE_A)
                 ->value('127.0.0.1')
-                ->name($name . $posfix)
+                ->name($this->name)
         );
         $this->recordId = $response->getRecord()->getId();
     }
@@ -61,7 +62,7 @@ class Record {
             throw new RuntimeException("Record does not exist.");
         }
         
-        return $this->client->getRecord($this->recordId)->getValue();
+        return $this->client->getRecord($this->recordId)->getRecord()->getValue();
     }
 
     function setIp($ip){
@@ -69,8 +70,12 @@ class Record {
             throw new RuntimeException("Record does not exist.");
         }
         
-        $record =  $this->client->getRecord($this->recordId);
-        $record->setValue($ip);
+        $record = (new MehrIt\HetznerDnsApi\Models\Record())
+                ->zoneId($this->zoneId)
+                ->ttl(TTL)
+                ->type(MehrIt\HetznerDnsApi\Models\Record::TYPE_A)
+                ->value($ip)
+                ->name($this->name);
         $this->client->updateRecord($this->recordId, $record);
     }
 }
